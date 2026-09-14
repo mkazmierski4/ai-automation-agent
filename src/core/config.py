@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-5"
 
     hitl_approval_timeout_seconds: int = 3600
+    # Ekstrakcje z confidence >= tego progu są zatwierdzane automatycznie
+    hitl_auto_approve_threshold: float = 0.9
 
 
 @lru_cache

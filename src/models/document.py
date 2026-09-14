@@ -64,20 +64,26 @@ class ApprovalStatus(str, Enum):
     """Stan akcji w kolejce Human-in-the-Loop."""
 
     PENDING = "pending"
+    AUTO_APPROVED = "auto_approved"
     APPROVED = "approved"
     REJECTED = "rejected"
 
 
 class ApprovalRequest(BaseModel):
-    """Akcja zaproponowana przez system, oczekująca na decyzję człowieka."""
+    """Akcja zaproponowana przez system, oczekująca na decyzję człowieka.
+
+    Pola `decided_at`, `decided_by` i `decision_notes` tworzą log audytowy
+    decyzji — zarówno ludzkiej, jak i automatycznej (auto-approve).
+    """
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     document_type: DocumentType
     proposed_action: str
     extracted_data: ExtractedDocument
     status: ApprovalStatus = ApprovalStatus.PENDING
-    reviewer_comment: str | None = None
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
     decided_at: datetime | None = None
+    decided_by: str | None = None
+    decision_notes: str | None = None

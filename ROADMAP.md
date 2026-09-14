@@ -36,13 +36,14 @@ oznaczają ukończone taski.
 - [x] Obsługa błędów walidacji i retry przy niezgodnej odpowiedzi modelu
 - [x] Testy z mockiem klienta LLM (bez realnych wywołań API) — 8 nowych testów
 
-## Faza 4: Silnik HITL i Przechowywanie
+## Faza 4: Silnik HITL i Przechowywanie ✅
 
-- [ ] `src/services/approval_queue.py` — warstwa przechowywania akcji
-      oczekujących (start: in-memory, docelowo SQLite)
-- [ ] Operacje: `create_pending`, `list_pending`, `approve`, `reject`
-- [ ] Log audytowy decyzji (kto/kiedy/co zatwierdził lub odrzucił)
-- [ ] Testy jednostkowe kolejki zatwierdzeń
+- [x] `src/services/approval_queue.py` — `BaseApprovalStorage` (DI) +
+      `InMemoryApprovalStorage`, docelowo podmienialna na SQLite/Postgres
+- [x] Operacje: `process_extraction` (z auto-approve wg progu confidence),
+      `list_pending`, `get_request`, `approve`, `reject`
+- [x] Log audytowy decyzji (`decided_at`, `decided_by`, `decision_notes`)
+- [x] Testy jednostkowe kolejki zatwierdzeń — 8 nowych testów
 
 ## Faza 5: API REST w FastAPI
 
