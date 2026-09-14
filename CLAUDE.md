@@ -1,71 +1,92 @@
 # CLAUDE.md
 
-Wytyczne dla pracy nad projektem **Human-in-the-Loop AI Document & Task Processor**.
+Wewnętrzny podręcznik inżynieryjny projektu **Human-in-the-Loop AI Document &
+Task Processor** — zasady architektoniczne, konwencje kodowania i workflow
+deweloperski obowiązujące w tym repozytorium.
 
-## Cel projektu
+## Zakres systemu
 
-Automatyzacja przetwarzania dokumentów biznesowych (PDF, e-mail) przy użyciu LLM
-ze structured outputs (Pydantic / JSON Schema), gdzie **każda zaproponowana akcja
-wymaga zatwierdzenia przez człowieka** przed wykonaniem. Projekt portfolio pod
-rekrutację AI Engineer / Automation Engineer.
+Usługa automatyzuje przetwarzanie dokumentów biznesowych (faktury,
+korespondencja e-mail) przy użyciu modeli językowych wymuszających
+ustrukturyzowany format wyjścia (Pydantic Structured Outputs / JSON Schema).
+Warstwa Human-in-the-Loop gwarantuje, że **żadna akcja zaproponowana przez
+model nie jest wykonywana bez jawnego zatwierdzenia przez uprawnionego
+operatora**.
 
 ## Stack technologiczny
 
 - **Python 3.11+**
 - **FastAPI** — warstwa API
-- **Pydantic v2** — walidacja danych i structured outputs z LLM
+- **Pydantic v2** — walidacja danych i structured outputs
 - **Uvicorn** — serwer ASGI
-- **pytest** — testy
-- LLM providerzy: OpenAI i/lub Anthropic (konfigurowalne przez `.env`)
+- **pytest** — testy jednostkowe i integracyjne
+- **ruff** — statyczna analiza kodu (lint)
+- **Docker / docker-compose** — konteneryzacja i uruchomienie środowiskowe
+- Dostawcy LLM: OpenAI i Anthropic, konfigurowalni przez zmienną `LLM_PROVIDER`
 
 ## Zasady kodowania
 
-- Zgodność z **PEP 8**, formatowanie i lint przez `black` + `ruff`.
-- Type hints wszędzie (`from __future__ import annotations` gdy potrzebne).
-- Krótkie, jednoznaczne docstringi (Google style) dla publicznych funkcji/klas.
-- Moduły trzymamy małe i jednoodpowiedzialne (single responsibility).
-- Żadna logika nie wykonuje akcji zewnętrznej (wysyłka maila, zapis do systemu,
-  itp.) bez przejścia przez warstwę zatwierdzenia (Human-in-the-Loop gate).
-- Sekrety wyłącznie przez zmienne środowiskowe (`.env`, nigdy hardcodowane).
+- Zgodność z **PEP 8**; lint egzekwowany przez `ruff` (konfiguracja w
+  `pyproject.toml`), obowiązkowo zielony w CI.
+- Type hints wszędzie (`from __future__ import annotations` w każdym module).
+- Docstringi (Google style) dla wszystkich publicznych klas i funkcji.
+- Moduły utrzymywane w zasadzie pojedynczej odpowiedzialności (SRP).
+- Żadna logika nie wykonuje akcji zewnętrznej (zapis, powiadomienie,
+  integracja) bez przejścia przez bramkę zatwierdzenia (Human-in-the-Loop).
+- Storage jest wstrzykiwany przez interfejs (`BaseApprovalStorage`) — brak
+  twardego powiązania logiki domenowej z konkretną implementacją bazy danych.
+- Sekrety wyłącznie przez zmienne środowiskowe (`.env`); nigdy w repozytorium.
 - Commity w konwencji [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`).
 
 ## Struktura katalogów
 
 ```
-projekt-ai-automatyzacja/
+.
 ├── src/
-│   ├── api/        # Routery FastAPI (endpointy HTTP)
-│   ├── core/       # Konfiguracja, logowanie, wyjątki, ustawienia
-│   ├── models/     # Schematy Pydantic (structured outputs, DTO)
-│   └── services/   # Logika biznesowa (ekstrakcja LLM, kolejka HITL, integracje)
-├── tests/          # Testy pytest (lustro struktury src/)
-├── .env.example    # Wzorzec zmiennych środowiskowych
-├── requirements.txt
-└── README.md
+│   ├── api/          # Warstwa HTTP: aplikacja FastAPI, routery v1, DI
+│   ├── core/         # Konfiguracja (pydantic-settings), logowanie, wyjątki
+│   ├── models/       # Schematy domenowe (Pydantic) i DTO API
+│   └── services/     # Logika biznesowa: klient LLM, parser, kolejka HITL
+├── tests/            # Testy pytest (jednostkowe + integracyjne)
+├── scripts/          # Skrypty pomocnicze (np. weryfikacja E2E)
+├── .github/workflows/ # Definicje CI (GitHub Actions)
+├── Dockerfile         # Obraz produkcyjny (multi-stage)
+├── docker-compose.yml # Uruchomienie lokalne/serwerowe jedną komendą
+└── pyproject.toml     # Konfiguracja narzędzi (ruff)
 ```
 
 ## Komendy uruchomieniowe
 
 ```bash
-# Instalacja zależności
+# Instalacja zależności (środowisko lokalne)
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 
-# Uruchomienie API (dev)
+# Serwer deweloperski
 uvicorn src.api.main:app --reload
 
-# Testy
+# Testy jednostkowe i integracyjne
 pytest
 
-# Lint / format
+# Lint
 ruff check .
-black .
+
+# Konteneryzacja
+docker compose up --build
+
+# Weryfikacja end-to-end (wymaga działającego serwera i skonfigurowanego .env)
+python scripts/demo_e2e.py
 ```
 
-## Sposób pracy w tym repo
+## Workflow deweloperski
 
-- Pracujemy iteracyjnie, krok po kroku — bez generowania dużych partii kodu naraz.
-- Przed modyfikacją plików edytujemy tylko niezbędne sekcje.
-- Każdy krok kończy się commitem opisującym zakres zmiany.
+- Zmiany wprowadzane iteracyjnie, w izolowanych, atomowych commitach.
+- Modyfikacje ograniczone do sekcji kodu bezpośrednio dotyczących zadania —
+  brak przypadkowych refaktoryzacji poza zakresem zmiany.
+- Każdy push do `main` oraz każdy pull request uruchamia CI (lint + pełny
+  zestaw testów); scalanie zmian bez przechodzącego CI jest niedozwolone.
+- Rozszerzenia architektoniczne (np. nowy storage, nowy dostawca LLM)
+  realizowane przez dodanie implementacji istniejącego interfejsu, bez
+  modyfikacji logiki konsumującej ten interfejs.

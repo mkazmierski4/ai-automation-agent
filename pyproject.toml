@@ -1,0 +1,14 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = [
+    # FastAPI's `Depends()` as an argument default is the documented
+    # dependency-injection idiom, not a mutable-default-argument bug.
+    "B008",
+    # `class Foo(str, Enum)` is used deliberately for broad Pydantic/OpenAPI
+    # compatibility instead of `enum.StrEnum`.
+    "UP042",
+]

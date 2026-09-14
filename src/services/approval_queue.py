@@ -8,7 +8,7 @@ bez zmian w `ApprovalQueueService`.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.core.config import Settings
 from src.models.document import ApprovalRequest, ApprovalStatus, ExtractedDocument
@@ -78,7 +78,7 @@ class ApprovalQueueService:
             status=ApprovalStatus.AUTO_APPROVED if is_confident else ApprovalStatus.PENDING,
         )
         if is_confident:
-            request.decided_at = datetime.now(timezone.utc)
+            request.decided_at = datetime.now(UTC)
             request.decided_by = "system"
             request.decision_notes = (
                 f"Auto-approve: confidence {extraction.confidence:.2f} >= próg "
@@ -105,7 +105,7 @@ class ApprovalQueueService:
         request.status = ApprovalStatus.APPROVED
         request.decided_by = reviewer
         request.decision_notes = notes
-        request.decided_at = datetime.now(timezone.utc)
+        request.decided_at = datetime.now(UTC)
         self._storage.update(request)
         return request
 
@@ -115,7 +115,7 @@ class ApprovalQueueService:
         request.status = ApprovalStatus.REJECTED
         request.decided_by = reviewer
         request.decision_notes = reason
-        request.decided_at = datetime.now(timezone.utc)
+        request.decided_at = datetime.now(UTC)
         self._storage.update(request)
         return request
 

@@ -10,7 +10,7 @@ Modele w tym module pełnią dwie role:
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -82,7 +82,7 @@ class ApprovalRequest(BaseModel):
     extracted_data: ExtractedDocument
     status: ApprovalStatus = ApprovalStatus.PENDING
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     decided_at: datetime | None = None
     decided_by: str | None = None

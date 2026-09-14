@@ -58,10 +58,12 @@ oznaczają ukończone taski.
 - [x] Testy integracyjne endpointów (FastAPI `TestClient`) — 8 nowych testów,
       pełny przepływ upload → pending → approve/reject
 
-## Faza 6: Konteneryzacja, Testy E2E i finalna dokumentacja
+## Faza 6: Konteneryzacja, CI/CD i szlif produkcyjny ✅
 
-- [ ] `Dockerfile` (+ opcjonalnie `docker-compose.yml`)
-- [ ] Testy end-to-end: upload → pending → approve → efekt akcji
-- [ ] CI: GitHub Actions (lint + pytest na każdy push/PR)
-- [ ] Finalizacja `README.md` pod CV (zrzuty ekranu / GIF, wyniki, ograniczenia)
-- [ ] Tag wersji / release
+- [x] `Dockerfile` (multi-stage, `python:3.11-slim`, non-root user, healthcheck)
+      i `docker-compose.yml` do uruchomienia jedną komendą
+- [x] Skrypt end-to-end (`scripts/demo_e2e.py`): upload → pending → approve →
+      weryfikacja statusu końcowego na żywym API
+- [x] CI: GitHub Actions (`ruff check` + `pytest` na każdy push/PR do `main`)
+- [x] Finalizacja `README.md` i `CLAUDE.md` w formie dokumentacji produktowej
+      (architektura, specyfikacja API, konfiguracja, wdrożenie kontenerowe)
