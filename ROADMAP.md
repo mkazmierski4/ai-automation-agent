@@ -26,15 +26,15 @@ oznaczają ukończone taski.
 - [x] `tests/test_config.py` — test wczytywania ustawień
 - [x] `pytest` przechodzi bez błędów (9/9)
 
-## Faza 3: Integracja z LLM (Service Parser)
+## Faza 3: Integracja z LLM (Service Parser) ✅
 
-- [ ] `src/services/llm_client.py` — abstrakcja nad OpenAI / Anthropic,
+- [x] `src/services/llm_client.py` — abstrakcja nad OpenAI / Anthropic,
       wybór providera na podstawie `LLM_PROVIDER`
-- [ ] Wymuszenie structured output (JSON Schema generowany z modeli Pydantic)
-- [ ] `src/services/document_parser.py` — pipeline: dokument → tekst → LLM →
+- [x] Wymuszenie structured output (JSON Schema generowany z modeli Pydantic)
+- [x] `src/services/document_parser.py` — pipeline: dokument → tekst → LLM →
       `ExtractedDocument`
-- [ ] Obsługa błędów walidacji i retry przy niezgodnej odpowiedzi modelu
-- [ ] Testy z mockiem klienta LLM (bez realnych wywołań API)
+- [x] Obsługa błędów walidacji i retry przy niezgodnej odpowiedzi modelu
+- [x] Testy z mockiem klienta LLM (bez realnych wywołań API) — 8 nowych testów
 
 ## Faza 4: Silnik HITL i Przechowywanie
 
