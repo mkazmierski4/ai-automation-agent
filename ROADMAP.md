@@ -45,14 +45,18 @@ oznaczają ukończone taski.
 - [x] Log audytowy decyzji (`decided_at`, `decided_by`, `decision_notes`)
 - [x] Testy jednostkowe kolejki zatwierdzeń — 8 nowych testów
 
-## Faza 5: API REST w FastAPI
+## Faza 5: API REST w FastAPI ✅
 
-- [ ] `src/api/main.py` — inicjalizacja aplikacji FastAPI
-- [ ] `POST /documents/upload` — przyjęcie pliku (PDF/e-mail) i uruchomienie ekstrakcji
-- [ ] `GET /approvals/pending` — lista akcji oczekujących na zatwierdzenie
-- [ ] `POST /approvals/{id}/decision` — decyzja Approve / Reject
-- [ ] `GET /health` — healthcheck
-- [ ] Testy integracyjne endpointów (FastAPI `TestClient`)
+- [x] `src/api/main.py` — inicjalizacja FastAPI (tytuł/opis/wersja pod `/docs`),
+      CORS middleware, exception handlery (`ApprovalRequestNotFoundError` → 404,
+      `InvalidApprovalStateError` → 409)
+- [x] `POST /api/v1/documents/process` — przyjęcie tekstu i uruchomienie
+      pipeline'u `DocumentParser` → `ApprovalQueueService`
+- [x] `GET /api/v1/approvals/pending` — lista akcji oczekujących na zatwierdzenie
+- [x] `POST /api/v1/approvals/{id}/approve` i `/reject` — decyzje z metadanymi recenzenta
+- [x] `GET /health` — healthcheck (status + środowisko)
+- [x] Testy integracyjne endpointów (FastAPI `TestClient`) — 8 nowych testów,
+      pełny przepływ upload → pending → approve/reject
 
 ## Faza 6: Konteneryzacja, Testy E2E i finalna dokumentacja
 
